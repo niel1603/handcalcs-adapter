@@ -34,17 +34,17 @@ print(f"\n-------------------------------------\n")
 # Steel
 E = 200 * SI.GPa
 # Beam and column
-F_y_beam_column = 344.738 * SI.MPa
-F_u_beam_column = 448.1594 * SI.MPa
+F_ybc = 344.738 * SI.MPa
+F_ubc = 448.1594 * SI.MPa
 # Plate
-F_y_plate = 344.738 * SI.MPa
-F_u_plate = 448.1594 * SI.MPa
+F_yp = 344.738 * SI.MPa
+F_up = 448.1594 * SI.MPa
 # Stiffener
-F_y_stiffener = 344.738 * SI.MPa
-F_u_stiffener = 448.1594 * SI.MPa
+F_ys = 344.738 * SI.MPa
+F_us = 448.1594 * SI.MPa
 # Bolt
-F_nt_bolt = 779.10788 * SI.MPa
-F_nv_bolt = 468.84368 * SI.MPa
+F_nt = 779.10788 * SI.MPa
+F_nv = 468.84368 * SI.MPa
 
 # Bolt pretension force
 T_b = 453.71844 * SI.kN # For grade A490 bolt according to AISC Specification Table J3.1
@@ -55,16 +55,16 @@ print(f"\nSteel:")
 print(f"E                       : {E}")
 
 print(f"\nBeam:")
-print(f"Fy beam and column      : {F_y_beam_column}")
-print(f"Fu beam and column      : {F_u_beam_column}")
+print(f"Fy beam and column      : {F_ybc}")
+print(f"Fu beam and column      : {F_ubc}")
 
 print(f"\nPlate:")
-print(f"Fy plate                : {F_y_plate}")
-print(f"Fu plate                : {F_u_plate}")
+print(f"Fy plate                : {F_yp}")
+print(f"Fu plate                : {F_up}")
 
 print(f"\nBolt:")
-print(f"Fnt bolt                : {F_nt_bolt}")
-print(f"Fnv bolt                : {F_nv_bolt}")
+print(f"Fnt bolt                : {F_nt}")
+print(f"Fnv bolt                : {F_nv}")
 
 print(f"\n-------------------------------------\n")
 
@@ -81,7 +81,7 @@ b_cf = 370.84   * SI.mm  # flange width
 t_cw = 12.319   * SI.mm  # web thick
 t_cf = 19.812   * SI.mm  # flange thick
 k_des = 35.052  * SI.mm  # fillet distance (design)
-
+    
 # End plate
 b_p = 228.6     * SI.mm  # plate width
 t_p = 22.225    * SI.mm  # plate thickness
@@ -260,10 +260,10 @@ print("  t_s ≥ t_s_min")
 print("  t_s ≥ t_bw(F_yb / F_ys)")
 
 print("Substitution:")
-print(f"  t_s ≥ {t_bw}({F_y_beam_column} / {F_y_stiffener})")
+print(f"  t_s ≥ {t_bw}({F_ybc} / {F_ys})")
 
 # Result
-t_s_min = t_bw*(F_y_beam_column / F_y_stiffener)
+t_s_min = t_bw*(F_ybc / F_ys)
 
 if t_s >= t_s_min:
     print(f"Result: {t_s} ≥ {t_s_min}  → OK")
@@ -281,11 +281,11 @@ print("Requirement:")
 print("  h_st / t_s ≤ 0.56 √(E / F_y_stiffener)")
 
 print("Substitution:")
-print(f"  {h_st} / {t_s} ≤ 0.56 √({E} / {F_y_stiffener})")
+print(f"  {h_st} / {t_s} ≤ 0.56 √({E} / {F_ys})")
 
 # Result
 slenderness_actual = h_st / t_s
-slenderness_limit = 0.56 * safe_sqrt(E / F_y_stiffener)
+slenderness_limit = 0.56 * safe_sqrt(E / F_ys)
 
 if slenderness_actual <= slenderness_limit:
     print(f"Result: {slenderness_actual} ≤ {slenderness_limit}  → OK")
@@ -412,11 +412,11 @@ print("  t_p ≥ t_p_req")
 
 # Substitution
 print("Substitution:")
-print(f"  t_p_req = √({M_u_eq} / ({gamma_r} * {theta_b} * {F_y_plate} * {Y_p}))")
+print(f"  t_p_req = √({M_u_eq} / ({gamma_r} * {theta_b} * {F_yp} * {Y_p}))")
 print(f"  {t_p} ≥ t_p_req")
 
 # Result
-t_p_req = safe_sqrt(M_u_eq / (gamma_r * theta_b * F_y_plate * Y_p))
+t_p_req = safe_sqrt(M_u_eq / (gamma_r * theta_b * F_yp * Y_p))
 
 if t_p >= t_p_req:
     print(f"Result:")
@@ -443,11 +443,11 @@ print("  P_t = F_nt_bolt * A_b")
 # Substitution
 print("Substitution:")
 print(f"  A_b = 1/4 * pi * {d_bolt}**2")
-print(f"  P_t = {F_nt_bolt} * A_b")
+print(f"  P_t = {F_nt} * A_b")
 
 # Result
 A_b = 1/4*math.pi*d_bolt**2
-P_t = F_nt_bolt * A_b
+P_t = F_nt * A_b
 
 print(f"Result:")
 print(f"  A_b = {A_b}")
@@ -530,12 +530,12 @@ print(f"  F_1_prime = 1/b1 * (F_1_prime_part1 + F_1_prime_part2)")
 
 # Substitution
 print("Substitution:")
-print(f"  F_1_prime_part1 = ({t_p}**2 * {F_y_plate}) / 4 * (0.85*{w1} + 0.8*{w1_prime})")
-print(f"  F_1_prime_part2 = (pi * {d_bolt}**3 * {F_nt_bolt}) / 32")
+print(f"  F_1_prime_part1 = ({t_p}**2 * {F_yp}) / 4 * (0.85*{w1} + 0.8*{w1_prime})")
+print(f"  F_1_prime_part2 = (pi * {d_bolt}**3 * {F_nt}) / 32")
 
 # Result
-F_1_prime_part1 = (t_p**2 * F_y_plate) / 4 * (0.85*w1 + 0.8*w1_prime)
-F_1_prime_part2 = (math.pi * d_bolt**3 * F_nt_bolt) / 32 
+F_1_prime_part1 = (t_p**2 * F_yp) / 4 * (0.85*w1 + 0.8*w1_prime)
+F_1_prime_part2 = (math.pi * d_bolt**3 * F_nt) / 32 
 F_1_prime = 1/b1 * (F_1_prime_part1 + F_1_prime_part2)
 
 print("Result:")
@@ -552,11 +552,11 @@ print("  Q_max1 = Q_max1_part1 * Q_max1_part2")
 # Substitution
 print("Substitution:")
 print(f"  Q_max1_part1 = ({w1_prime}*{t_p}**2) / (4*{a1})")
-print(f"  Q_max1_part2 =  √(({F_y_plate}**2) - (3*({F_1_prime}/({w1_prime}*{t_p}))**2))")
+print(f"  Q_max1_part2 =  √(({F_yp}**2) - (3*({F_1_prime}/({w1_prime}*{t_p}))**2))")
 
 # Result
 Q_max1_part1 = (w1_prime*t_p**2) / (4*a1)
-Q_max1_part2 = safe_sqrt(F_y_plate**2 - 3*(F_1_prime/(w1_prime*t_p))**2)
+Q_max1_part2 = safe_sqrt(F_yp**2 - 3*(F_1_prime/(w1_prime*t_p))**2)
 Q_max1 = Q_max1_part1 * Q_max1_part2
 
 print("Result:")
@@ -614,12 +614,12 @@ print(f"  F_2_prime = 1/b2 * (F_2_prime_part1 + F_2_prime_part2)")
 
 # Substitution
 print("Substitution:")
-print(f"  F_2_prime_part1 = ({t_p}**2 * {F_y_plate}) / 4 * (0.85*{w1} + 0.8*{w1_prime})")
-print(f"  F_2_prime_part2 = (pi * {d_bolt}**3 * {F_nt_bolt}) / 32")
+print(f"  F_2_prime_part1 = ({t_p}**2 * {F_yp}) / 4 * (0.85*{w1} + 0.8*{w1_prime})")
+print(f"  F_2_prime_part2 = (pi * {d_bolt}**3 * {F_nt}) / 32")
 
 # Result
-F_2_prime_part1 = (t_p**2 * F_y_plate) / 4 * (0.85*w1 + 0.8*w1_prime)
-F_2_prime_part2 = (math.pi * d_bolt**3 * F_nt_bolt) / 32 
+F_2_prime_part1 = (t_p**2 * F_yp) / 4 * (0.85*w1 + 0.8*w1_prime)
+F_2_prime_part2 = (math.pi * d_bolt**3 * F_nt) / 32 
 F_2_prime = 1/b2 * (F_2_prime_part1 + F_2_prime_part2)
 
 print("Result:")
@@ -636,11 +636,11 @@ print("  Q_max2 = Q_max2_part1 * Q_max2_part2")
 # Substitution
 print("Substitution:")
 print(f"  Q_max2_part1 = ({w1_prime}*{t_p}**2) / (4*{a2})")
-print(f"  Q_max2_part2 =  √(({F_y_plate}**2) - (3*({F_2_prime}/({w1_prime}*{t_p}))**2))")
+print(f"  Q_max2_part2 =  √(({F_yp}**2) - (3*({F_2_prime}/({w1_prime}*{t_p}))**2))")
 
 # Result
 Q_max2_part1 = (w1_prime*t_p**2) / (4*a2)
-Q_max2_part2 = safe_sqrt(F_y_plate**2 - 3*(F_2_prime/(w1_prime*t_p))**2)
+Q_max2_part2 = safe_sqrt(F_yp**2 - 3*(F_2_prime/(w1_prime*t_p))**2)
 Q_max2 = Q_max2_part1 * Q_max2_part2
 
 print("Result:")
@@ -717,12 +717,12 @@ print("  V_n ≥ V_u")
 
 # Substitution
 print("Substitution:")
-print(f"  Rn_bt = {F_nv_bolt} * {A_b}")
-print(f"  Rn_brg = 2.4*{d_bolt}*{t_cf}*{F_u_beam_column}")
+print(f"  Rn_bt = {F_nv} * {A_b}")
+print(f"  Rn_brg = 2.4*{d_bolt}*{t_cf}*{F_ubc}")
 
 # Result
-Rn_bt = F_nv_bolt * A_b
-Rn_brg = 2.4*d_bolt*t_cf*F_u_beam_column
+Rn_bt = F_nv * A_b
+Rn_brg = 2.4*d_bolt*t_cf*F_ubc
 V_n = theta_v*4*min(Rn_bt, Rn_brg)
 
 print("Result:")
