@@ -1,5 +1,5 @@
-from handcalcs_adapter.section import section
-sec = section("C150x50x20x3.2")
+from handcalcs_adapter.section import section, Section
+sec = section(Section.C200x75x20x2_8)
 
 ## 2. Selec purlin
 section_name = (sec.name)

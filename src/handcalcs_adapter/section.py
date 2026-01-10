@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+from importlib import resources
 import csv
+from pathlib import Path
+
 from dataclasses import dataclass
 from enum import Enum
-from pathlib import Path
 from typing import Union
 
 from handcalcs_adapter.units import *
@@ -90,10 +92,14 @@ class CnpSection(SteelSection):
 # LOADERS
 # =========================================================
 
-def _load_cnp(path: Path, standard: str) -> dict[str, CnpSection]:
+def _load_cnp(*, standard: str) -> dict[str, CnpSection]:
     table = {}
 
-    with open(path, newline="", encoding="utf-8-sig") as f:
+    # Access CSV as a package resource
+    with resources.files("handcalcs_adapter.data").joinpath(
+        "CNP GRP.csv"
+    ).open("r", encoding="utf-8-sig", newline="") as f:
+
         reader = csv.DictReader(f)
 
         for r in reader:
@@ -102,7 +108,7 @@ def _load_cnp(path: Path, standard: str) -> dict[str, CnpSection]:
             table[name] = CnpSection(
                 name=name,
                 standard=standard,
-                source=path.name,
+                source="CNP GRP.csv",
                 t=float(r["t_mm"]) * mm,
                 A=float(r["A_cm2"]) * cm**2,
                 w=float(r["w_kg/m"]) * kg / m,
@@ -125,18 +131,16 @@ def _load_cnp(path: Path, standard: str) -> dict[str, CnpSection]:
 # SOURCE CATALOG
 # =========================================================
 
-_THIS_DIR = Path(__file__).resolve().parent
-_DATA_DIR = _THIS_DIR / "data"
-
 _SOURCES = [
     {
         "name": "CNP_GRP",
-        "path": _DATA_DIR / "CNP GRP.csv",
         "standard": "JIS 3192",
         "loader": _load_cnp,
     }
 ]
 
+
+_SECTION_CACHE: dict[str, dict[str, SteelSection]] = {}
 
 # =========================================================
 # CACHE + PUBLIC API
@@ -151,13 +155,18 @@ def _normalize_name(name: Union[str, Section]) -> str:
     return name
 
 
-def _load_source(src):
+def _load_source(src: dict) -> dict[str, SteelSection]:
+    """
+    Load section table from a source (cached).
+    """
     key = src["name"]
 
-    if key not in _cache:
-        _cache[key] = src["loader"](src["path"], src["standard"])
+    if key not in _SECTION_CACHE:
+        _SECTION_CACHE[key] = src["loader"](
+            standard=src["standard"]
+        )
 
-    return _cache[key]
+    return _SECTION_CACHE[key]
 
 
 def section(name: Union[str, Section]) -> SteelSection:
@@ -168,14 +177,19 @@ def section(name: Union[str, Section]) -> SteelSection:
         section("C150x50x20x3.2")
         section(Section.C150x50x20x3_2)
     """
-    name = _normalize_name(name)
+    key = _normalize_name(name)
 
     for src in _SOURCES:
         table = _load_source(src)
-        if name in table:
-            return table[name]
+        if key in table:
+            return table[key]
 
-    raise KeyError(f"Section not found: {name}")
+    raise KeyError(f"Section not found: {key}")
 
+__all__ = [
+    "section",
+    "Section",
+    "SteelSection",
+    "CnpSection",
+]
 
-__all__ = ["section", "Section", "SteelSection", "CnpSection"]
